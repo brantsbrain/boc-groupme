@@ -25,8 +25,8 @@ const respond = async (req, res) => {
     // If text matches regex
     if (requesttext) {
       res.writeHead(200)
-      // Add a quick delay so group me sends msg to server first instead of bot
       await sleep(1500)
+      
       if (prayregex.test(requesttext) || praiseregex.test(requesttext)) {
         const msgId = request.id
         if (!msgId) {
