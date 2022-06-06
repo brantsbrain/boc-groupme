@@ -14,8 +14,9 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const weeklyList = nodeCron.schedule("*/3 * * * *", function postPrayerRequestList() {
+const weeklyList = nodeCron.schedule("*/3 * * * *", function weeklyList() {
   console.log("Posting prayer request list...")
+  postPrayerRequestList()
 })
 
 // Generate a response
