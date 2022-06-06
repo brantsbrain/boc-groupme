@@ -14,7 +14,8 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const weeklyList = nodeCron.schedule("5 19 * * *", function weeklyList() {
+// Adjust +4 hours for UTC
+const weeklyList = nodeCron.schedule("0 20 * * *", function weeklyList() {
   console.log("Posting prayer request list...")
   postPrayerRequestList()
 })
