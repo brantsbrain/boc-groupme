@@ -8,9 +8,14 @@ const {
   everyoneregex, createMention, getAdmins,
   postPrayerRequestList
 } = require("./groupme-api")
+const nodeCron = require("node-cron")
 
 const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const weeklyList = nodeCron.schedule("*/3 * * * *", postPrayerRequestList()) {
+  console.log("Posting prayer request list...")
 }
 
 // Generate a response
@@ -26,7 +31,7 @@ const respond = async (req, res) => {
     if (requesttext) {
       res.writeHead(200)
       await sleep(1500)
-      
+
       if (prayregex.test(requesttext) || praiseregex.test(requesttext)) {
         const msgId = request.id
         if (!msgId) {
