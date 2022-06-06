@@ -46,7 +46,7 @@ const postPrayerRequestList = async () => {
     const prayList = filterRegexMsgList(myLikeList, prayregex)
     const praiseList = filterRegexMsgList(myLikeList, praiseregex)
     const praisepraylist = praiseList.concat(prayList)
-    await filterAndPostWeeklyList(praisepraylist) // come back
+    await filterAndPostWeeklyList(praisepraylist)
 }
 
 // The bot retrieves a list of messages that the owner of the bot has liked
@@ -175,10 +175,15 @@ const splitInto1000CharList = (msg) => {
 
 // Post all the messages in msgList
 const postMsgList = async (msgList) => {
+  if (msgList.length == 0) {
+    await createPost("Prayer/Praise list empty this week!")
+  }
+  else {
     for (let i = 0; i < msgList.length; i++) {
         let msg = msgList[i]
         await createPost(msg)
     }
+  }
 }
 
 // Get members

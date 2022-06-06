@@ -14,7 +14,7 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const weeklyList = nodeCron.schedule("0 15 * * *", function weeklyList() {
+const weeklyList = nodeCron.schedule("5 19 * * *", function weeklyList() {
   console.log("Posting prayer request list...")
   postPrayerRequestList()
 })
@@ -36,7 +36,7 @@ const respond = async (req, res) => {
       if (prayregex.test(requesttext) || praiseregex.test(requesttext)) {
         const msgId = request.id
         if (!msgId) {
-          console.log("Message id is undefined")
+          console.log("Message ID is undefined")
         }
         msgId && await likeMessage(msgId)
       }
