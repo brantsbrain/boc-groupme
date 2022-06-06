@@ -7,7 +7,7 @@ const baseurl = "https://api.groupme.com/"
 const helptext = "Prayer Bot Commands:\n" +
                   "/pray - Submit something you'd like prayer for\n" +
                   "/praise - Submit something you want to praise\n" +
-                  "/list - List all prayers and praises within the past week\n" +
+                  "/list - List all prayers and praises within the past week (auto-posts Sunday 8:00 AM)\n" +
                   "/sheet - Post link to Sabbath Dinner sheet\n" +
                   "/everyone - Mention everyone in the group (admins only)\n"
 

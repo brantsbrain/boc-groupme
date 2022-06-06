@@ -15,7 +15,8 @@ const sleep = (ms) => {
 }
 
 // Adjust +4 hours for UTC
-const weeklyList = nodeCron.schedule("0 20 * * *", function weeklyList() {
+// Post weekly on Sunday 8:00 AM EST
+const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
   console.log("Posting prayer request list...")
   postPrayerRequestList()
 })
