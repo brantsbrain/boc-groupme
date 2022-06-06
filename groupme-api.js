@@ -7,7 +7,7 @@ const baseurl = "https://api.groupme.com/"
 const helptext = "Prayer Bot Commands:\n" +
                   "/pray - Submit something you'd like prayer for\n" +
                   "/praise - Submit something you want to praise\n" +
-                  "/list - List all prayers and praises within the past week\n" +
+                  "/list - List all prayers and praises within the past week (auto-posts Sunday 8:00 AM)\n" +
                   "/sheet - Post link to Sabbath Dinner sheet\n" +
                   "/everyone - Mention everyone in the group (admins only)\n"
 
@@ -46,12 +46,11 @@ const postPrayerRequestList = async () => {
     const prayList = filterRegexMsgList(myLikeList, prayregex)
     const praiseList = filterRegexMsgList(myLikeList, praiseregex)
     const praisepraylist = praiseList.concat(prayList)
-    await filterAndPostWeeklyList(praisepraylist) // come back
+    await filterAndPostWeeklyList(praisepraylist)
 }
 
-// The bot retrieves a list of msg that the owner of the bot has liked
+// The bot retrieves a list of messages that the owner of the bot has liked
 const getMyLikeList = async () => {
-    // GET /groups/:group_id/likes/mine
     try {
         const myLikePath = `/v3/groups/${groupid}/likes/mine?token=${accesstoken}`
         const destUrl = new URL(myLikePath, baseurl)
@@ -71,12 +70,12 @@ const getMyLikeList = async () => {
     }
 }
 
-// Returns a list of msg that matches the regex
+// Returns a list of messages that matches the regex
 const filterRegexMsgList = (msgList, regex) => {
     return msgList.filter(msg => (msg.text && regex.test(msg.text)))
 }
 
-// Filter and post msg that are within the week
+// Filter and post messages that are within the past seven days
 const filterAndPostWeeklyList = async (msgList) => {
     const event = new Date()
 
@@ -92,7 +91,7 @@ const filterAndPostWeeklyList = async (msgList) => {
     await postMsgList(prayerRequestPostMsgList)
 }
 
-// Returns a list of msg that have timestamps greater than cutOffTime
+// Returns a list of messages that have timestamps greater than cutOffTime
 const filterTimeMsgList = (msgList, cutOffTime) => {
     return msgList.filter(msg =>
         (msg.liked_at && Date.parse(msg.liked_at) > cutOffTime)
@@ -155,7 +154,7 @@ const composePrayerRequestList = (msgList) => {
     return postList
 }
 
-// Split the msg into a list of msg under that is 999 len long
+// Split the message into a list of mgessages that is under 999 len long
 const splitInto1000CharList = (msg) => {
     const msgList = []
     let smallMsg = ""
@@ -174,12 +173,17 @@ const splitInto1000CharList = (msg) => {
     return msgList
 }
 
-// Post all the msg in msgList
+// Post all the messages in msgList
 const postMsgList = async (msgList) => {
+  if (msgList.length == 0) {
+    await createPost("Prayer/Praise list empty this week!")
+  }
+  else {
     for (let i = 0; i < msgList.length; i++) {
         let msg = msgList[i]
         await createPost(msg)
     }
+  }
 }
 
 // Get members
