@@ -8,14 +8,14 @@ We are constantly looking for ways to improve on current functionality and imple
 
 ## Commands
 
-| Command | Usage | Purpose |
-| ------- | ----- | ------- |
-| `/pray` | `/pray [prayer request]` | Submits prayer request on behalf of user |
-| `/praise` | `/praise [praise request]` | Submits praise request on behalf of user |
-| `/list` | `/list` | Lists all prayer/praise requests within the past week |
-| `/sheet` | `/sheet` | Posts the link to a viewable-by-everyone spreadsheet |
-| `/everyone` | `/everyone [message to mention everyone]` | Admin-only command that has the bot repost the given message while mentioning everyone in the group
-| `/help` | `/help` | Posts an abbreviated version of the above commands' usage
+| Command Usage | Purpose |
+| ------------- | ------- |
+| `/pray [prayer request]` | Submits prayer request on behalf of user |
+| `/praise [praise request]` | Submits praise request on behalf of user |
+| `/list` | Lists all prayer/praise requests within the past week |
+| `/sheet` | Posts the link to a viewable-by-everyone spreadsheet |
+| `/everyone [message to mention everyone]` | Admin-only command that has the bot repost the given message while mentioning everyone in the group
+| `/help` | Posts an abbreviated version of the above commands' usage
 
 ---
 

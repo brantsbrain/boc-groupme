@@ -1,6 +1,5 @@
 const express = require("express")
 const {respond} = require("./bot")
-const {postPrayerRequestList} = require("./groupme-api")
 
 const port = Number(process.env.PORT || 5000)
 const app = express()
