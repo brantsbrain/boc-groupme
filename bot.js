@@ -1,3 +1,4 @@
+////////// IMPORTS //////////
 const cool = require('cool-ascii-faces')
 const {
   praiseregex, prayregex,
@@ -10,10 +11,12 @@ const {
 } = require("./groupme-api")
 const nodeCron = require("node-cron")
 
+////////// INITIALIZE VARS //////////
 const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+////////// CRON JOBS //////////
 // Adjust +4 hours for UTC
 // Post weekly on Sunday 8:00 AM EST
 const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
@@ -21,7 +24,7 @@ const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
   postPrayerRequestList()
 })
 
-// Generate a response
+////////// RESPOND //////////
 const respond = async (req, res) => {
   try {
     const request = req.body
@@ -30,11 +33,13 @@ const respond = async (req, res) => {
     const sendername = request.name
     console.log(`User request: "${requesttext}"`)
 
-    // If text matches regex
+    // If text exists
     if (requesttext) {
       res.writeHead(200)
       await sleep(1500)
 
+      ////////// BASE CONTROLS //////////
+      // Like prayer/praise request
       if (prayregex.test(requesttext) || praiseregex.test(requesttext)) {
         const msgId = request.id
         if (!msgId) {
@@ -42,15 +47,30 @@ const respond = async (req, res) => {
         }
         msgId && await likeMessage(msgId)
       }
+
+      // Post prayer request list
       else if (genlistregex.test(requesttext)) {
         await postPrayerRequestList()
-      } else if (coolregex.test(requesttext)) {
+      } 
+      
+      // Post cool face
+      else if (coolregex.test(requesttext)) {
         await createCoolFaceMessage()
-      } else if (sheetregex.test(requesttext)) {
+      } 
+      
+      // Post sheet link
+      else if (sheetregex.test(requesttext)) {
         await createPost(sheetid)
-      } else if (helpregex.test(requesttext)) {
+      } 
+      
+      // Post help text
+      else if (helpregex.test(requesttext)) {
         await createPost(helptext)
-      } else if (everyoneregex.test(requesttext)) {
+      } 
+      
+      ////////// ADMIN CONTROLS //////////
+      // Mention everyone
+      else if (everyoneregex.test(requesttext)) {
           let adminarr = await getAdmins()
           if (adminarr.indexOf(senderid) > -1) {
             await createMention(requesttext)
@@ -59,6 +79,8 @@ const respond = async (req, res) => {
             console.log(`${sendername} attempted to mention everybody`)
           }
         }
+
+      ////////// NO CONDITIONS MET //////////
       else {
         console.log("Just chilling... doing nothing...")
       }
@@ -76,6 +98,7 @@ const respond = async (req, res) => {
   }
 }
 
+// Create cool face
 const createCoolFaceMessage = async () => {
   const botResponse = cool()
   await createPost(botResponse)
