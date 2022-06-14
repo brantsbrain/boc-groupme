@@ -236,7 +236,7 @@ const createMention = async (slashtext) => {
   // Get member IDs as an array and push to message variable
   members = await getMembers()
   for (let i = 0; i < members.length; i++) {
-    message.attachments[0].loci.push([i, i + 1])
+    message.attachments[0].loci.push([0, text.length])
     message.attachments[0].user_ids.push(members[i])
   }
 
