@@ -32,7 +32,7 @@ We are constantly looking for ways to improve on current functionality and imple
 
 ### 1. Forking GitHub Repo
 
-1. Fork `brantsbrain/boc-groupme/prod` to your own GitHub account
+1. Fork the `prod` branch of `brantsbrain/boc-groupme` to your own GitHub account
 
 ### 2. Prepping Heroku App
 
