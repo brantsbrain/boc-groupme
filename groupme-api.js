@@ -15,6 +15,7 @@ const bot_id = process.env.BOT_ID
 const accesstoken = process.env.ACCESS_TOKEN
 const groupid = process.env.GROUP_ID
 const sheetid = process.env.SHEET_ID
+const loguserid = process.env.LOG_USERID
 
 if (!accesstoken) {
     console.log("ENV: 'ACCESS_TOKEN' is undefined")
@@ -69,6 +70,66 @@ const getMyLikeList = async () => {
         console.log(error)
     }
 }
+
+const sendDm = async (userid, message) => {
+    console.log(`Creating new DM (${message.length}): ${message}`)
+    const recipient_id = userid
+    
+    // Prep message as array to accomadate long messages 
+    var messagearr = []
+    var currmess = ""
+    for (let i = 0; i < message.length; i++) {
+      if (currmess.length < 999) {
+        currmess += message[i]
+      }
+      else {
+        messagearr.push(currmess)
+        console.log(`Maxed out currmess at ${currmess.length}`)
+        currmess = ""
+        i -= 1
+      }
+    }
+    if (currmess.length > 0) {
+      messagearr.push(currmess)
+    }
+    
+    for (let i = 0; i < messagearr.length; i++) {
+      sleep(5000)
+      const source_guid = String(Math.random().toString(36).substring(2, 34))
+      const message = {
+        direct_message: {
+          recipient_id,
+          source_guid,
+          "text" : messagearr[i]
+        }
+      }
+  
+      // Prep message as JSON and construct packet
+      const json = JSON.stringify(message)
+      const groupmeAPIOptions = {
+        agent: false,
+        host: "api.groupme.com",
+        path: "/v3/direct_messages",
+        port: 443,
+        method: "POST",
+        headers: {
+          "Content-Length": json.length,
+          "Content-Type": "application/json",
+          "X-Access-Token": accesstoken
+        }
+      }
+  
+      // Send request
+      const req = https.request(groupmeAPIOptions, response => {
+        let data = ""
+        response.on("data", chunk => (data += chunk))
+        response.on("end", () =>
+          console.log(`[GROUPME RESPONSE] ${response.statusCode} ${data}`)
+        )
+      })
+      req.end(json)
+    }
+  }
 
 // Returns a list of messages that matches the regex
 const filterRegexMsgList = (msgList, regex) => {
@@ -176,7 +237,7 @@ const splitInto1000CharList = (msg) => {
 // Post all the messages in msgList
 const postMsgList = async (msgList) => {
   if (msgList.length == 0) {
-    await createPost("Prayer/Praise list empty this week!")
+    await sendDm(loguserid, "Prayer/Praise list empty")
   }
   else {
     for (let i = 0; i < msgList.length; i++) {
