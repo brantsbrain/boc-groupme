@@ -27,6 +27,10 @@ if (!sheetid) {
     console.log("ENV: 'SHEET_ID' is undefined")
 }
 
+const sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 // msgId: str
 // The bot uses the owner's credential to like a message with msgId
 const likeMessage = async (msgId) => {
