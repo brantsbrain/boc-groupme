@@ -148,10 +148,9 @@ const filterAndPostWeeklyList = async (msgList) => {
 
     // Retrieve the older date
     const pastDate = event.getDate() - 7
-    event.setDate(pastDate)
-    console.log(event)
+    // console.log(pastDate)
 
-    const roundedDate = event.toLocaleDateString()
+    const roundedDate = pastDate.toLocaleDateString()
     console.log(roundedDate)
 
     // Filter out all the msg that have timestamps greater than roundedDate
@@ -169,7 +168,7 @@ const filterAndPostWeeklyList = async (msgList) => {
 const filterTimeMsgList = (msgList, cutOffTime) => {
   console.log(msgList)
     return msgList.filter(msg =>
-        (msg.liked_at && Date.parse(msg.liked_at) > cutOffTime)
+        (msg.created_at && Date.parse(msg.created_at) > cutOffTime)
     )
 }
 
