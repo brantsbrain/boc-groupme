@@ -157,8 +157,12 @@ const filterAndPostWeeklyList = async (msgList) => {
 
     // Filter out all the msg that have timestamps greater than roundedDate
     // const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
-    const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
+
+    console.log(msgList.length)
+    const filteredTimePrayerList = msgList.filter(msg => (msg.created_at > roundedDate))
+    // const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
     console.log("After filter")
+    console.log(filteredTimePrayerList.length)
     console.log(filteredTimePrayerList)
 
     const prayerRequestPostMsgList = composePrayerRequestList(filteredTimePrayerList)
@@ -168,11 +172,11 @@ const filterAndPostWeeklyList = async (msgList) => {
 }
 
 // Returns a list of messages that have timestamps greater than cutOffTime
-const filterTimeMsgList = (msgList, cutOffTime) => {
-    return msgList.filter(msg =>
-        (msg.created_at && msg.created_at > cutOffTime)
-    )
-}
+// const filterTimeMsgList = (msgList, cutOffTime) => {
+//     return msgList.filter(msg =>
+//         (msg.created_at && msg.created_at > cutOffTime)
+//     )
+// }
 
 // Returns a list of posts that meets the character count requirement
 const composePrayerRequestList = (msgList) => {
