@@ -156,14 +156,15 @@ const filterAndPostWeeklyList = async (msgList) => {
 
     // Filter out all the msg that have timestamps greater than roundedDate
     const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
-    console.log(filteredTimePrayerList)
+    // console.log(filteredTimePrayerList)
     const prayerRequestPostMsgList = composePrayerRequestList(filteredTimePrayerList)
-    console.log(prayerRequestPostMsgList)
+    // console.log(prayerRequestPostMsgList)
     await postMsgList(prayerRequestPostMsgList)
 }
 
 // Returns a list of messages that have timestamps greater than cutOffTime
 const filterTimeMsgList = (msgList, cutOffTime) => {
+  console.log(msgList)
     return msgList.filter(msg =>
         (msg.liked_at && Date.parse(msg.liked_at) > cutOffTime)
     )
@@ -176,7 +177,7 @@ const composePrayerRequestList = (msgList) => {
 
     // Displays prayer list in chronological order
     msgList = msgList.reverse()
-    console.log(msgList)
+    // console.log(msgList)
 
     msgList.map((msg) => {
         const userName = msg.name
