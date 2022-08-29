@@ -66,6 +66,7 @@ const getMyLikeList = async () => {
         if (response.statusCode == 200) {
             const likedMessageList = response.body.response.messages
             console.log("Got liked messages list...")
+            console.log(likedMessageList)
             return likedMessageList
         }
         return []
