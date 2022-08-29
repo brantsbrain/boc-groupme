@@ -165,11 +165,9 @@ const filterAndPostWeeklyList = async (msgList) => {
       // console.log(String(Date.parse(msgList[i].created_at)))
       console.log(new Date(msgList[i].created_at * 1000) > Date.parse(roundedDate))
       console.log(Date.parse(msgList[i].created_at * 1000) > Date.parse(roundedDate))
-      // console.log(msgList[i].created_at.toLocaleDateString() > roundedDate)
     }
 
-    const filteredTimePrayerList = msgList.filter(msg => (Date.parse(new Date(msg.created_at * 1000)) > roundedDate))
-    // const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
+    const filteredTimePrayerList = msgList.filter(msg => (Date.parse(new Date(msg.created_at * 1000)) > Date.parse(roundedDate)))
 
     console.log("After filter")
     console.log(filteredTimePrayerList.length)
