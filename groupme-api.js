@@ -144,16 +144,21 @@ const filterRegexMsgList = (msgList, regex) => {
 // Filter and post messages that are within the past seven days
 const filterAndPostWeeklyList = async (msgList) => {
     const event = new Date()
+    console.log(event)
 
     // Retrieve the older date
     const pastDate = event.getDate() - 7
     event.setDate(pastDate)
+    console.log(pastDate)
 
     const roundedDate = event.toLocaleDateString()
+    console.log(roundedDate)
 
     // Filter out all the msg that have timestamps greater than roundedDate
     const filteredTimePrayerList = filterTimeMsgList(msgList, Date.parse(roundedDate))
+    console.log(filteredTimePrayerList)
     const prayerRequestPostMsgList = composePrayerRequestList(filteredTimePrayerList)
+    console.log(prayerRequestPostMsgList)
     await postMsgList(prayerRequestPostMsgList)
 }
 
