@@ -1,6 +1,8 @@
 # GroupMe Prayer Bot
 
-The heart behind this bot was to ensure that we could keep track of prayer and praise requests from any number of members of a GroupMe chat over the course of a week to be consistently keeping friends and family in mind and lifted up to the Lord. 
+The heart behind this bot was to ensure that we could keep track of prayer and praise requests from any number of members of a GroupMe chat over the course of a week to be consistently keeping friends and family in mind and lifted up to the Lord.
+
+If the optional crontab functionality is implemented, these prayers/praises can be scheduled to post weekly at any given time to remind members of previous posts.
 
 We are constantly looking for ways to improve on current functionality and implement new functionality. We know we're not JS pros! Please create an issue or submit a pull request if you'd like to contribute to the repo!
 
@@ -21,49 +23,53 @@ We are constantly looking for ways to improve on current functionality and imple
 
 ## Implementation/Setup
 
+This app originally ran on Heroku, a Platform as a Service (PaaS) vendor, but their free tier has been rescinded as of 9/28/22. After some digging, we found Google Cloud Provider (GCP) offers a free tier for similar functionality up to a certain ceiling, which we don't expect to hit. Details of their pricing plan for this functionality can be found at [https://cloud.google.com/run/pricing](https://cloud.google.com/run/pricing)
+
 ### Prerequisites:
 
 | Tool | Website | Purpose |
 | ---- | ------- | ------- |
-| GitHub Account | [www.github.com](www.github.com) | Hosts the JS code that deploys to Heroku |
-| GroupMe Developer Account | [dev.groupme.com](dev.groupme.com) | Integrates bot into GroupMe chats and forwards messages to Heroku callback URL |
-| Heroku Personal Use Account | [www.heroku.com](www.heroku.com) | Platform as a Service (PaaS) to receive messages from GroupMe bot and respond using JS app
-| (Optional) Cron-Job Account | [www.cron-job.org](www.cron-job.org) | Wakes Heroku app if asleep to execute node-cron logic in JS app
+| GitHub Account | [www.github.com](www.github.com) | Hosts the JS code that deploys to GCP |
+| GroupMe Developer Account | [dev.groupme.com](dev.groupme.com) | Integrates bot into GroupMe chats and forwards messages to GCP callback URL |
+| Google Cloud Platform (GCP) Account | [cloud.google.com](cloud.google.com) | Used to receive messages from GroupMe bot and respond using JS app
+| (Optional) Cron-Job Account | [www.cron-job.org](www.cron-job.org) | Wakes GCP app if asleep to execute node-cron logic in JS app
 
 ### 1. Forking GitHub Repo
 
 1. Fork the `prod` branch of `brantsbrain/boc-groupme` to your own GitHub account
 
-### 2. Prepping Heroku App
+### 2. Prepping GCP
 
-1. Browse to [dashboard.heroku.com](dashboard.heroku.com) > New > Create New App
-2. Give the app a unique name and click Create
-3. Connect to GitHub by browsing to Deploy > Deployment Method > GitHub and sign in using your GitHub credentials
-4. Attach the forked `boc-groupme/prod` repo to the app
-5. Make note of the Heroku app URL under Settings > Domains
-
+1. Browse to [cloud.google.com](cloud.google.com) and go to the console. If you haven't already, create a new project.
+2. Search for and select `Cloud Run` in the search bar.
+3. Click `CREATE SERVICE` in the top of the window.
+    1. Click `Continously deploy new revisions from a source repository` followed by `SET UP WITH CLOUD BUILD`
+    2. Follow the steps to connect the GitHub repository and the `prod` branch and click `Save` to confirm.
+    3. Select `Allow unauthenticated invocations` under Authentication
+4. Pause here and continue to the next section
+    
 ### 3. Creating GroupMe Bot
 
 1. Browse to [dev.groupme.com](dev.groupme.com) > Bots > Create Bot
 2. Choose the desired chat for the bot (Note: You must be the owner or an admin of the chat to add a bot)
 3. Give the bot a name that will appear with each posted message in your chat
-4. Insert the URL found in step 5 of `Prepping Heroku App` for the `Callback URL` field
+4. `Callback URL` is very important, but we don't have it yet. Leave it blank for now.
 5. `Avatar URL` is optional, but must be an absolute URL path to an image format file (i.e., ending with .jpeg, .png, etc.)
 6. Click `Submit` and check the desired GroupMe chat to ensure the bot was added
 
-### 4. Addtional Prep and Deploying Heroku App
+### 4. Addtional Prep in GCP and Deploying App
 
-1. In the Heroku app, browse to Settings > Config Vars > Reveal Config Vars
-2. `boc-groupme` has three required and one optional Config Var: 
-    | Config Var | Location |
+1. Expand the `Container, Connections, Security` section and add these Environment Variables:
+
+    | Environment Variable | Location |
     | ---------- | -------- |
     | ACCESS_TOKEN | [dev.groupme.com](dev.groupme.com) > Access Token |
     | BOT_ID | [dev.groupme.com](dev.groupme.com) > Bots > Created Bot > Bot ID |
     | GROUP_ID | [dev.groupme.com](dev.groupme.com) > Bots > Created Bot > Group Id |
-    | SHEET_ID (Optional) | A viewable-by-everyone shared link to a Google Sheet |
-3. Insert the Config Var as the `KEY` and the location values as the `VALUE`
-4. Deploy the Heroku app by going to Deploy > Manual Deploy > Deploy Branch (Note: You should be deploying the `prod` branch)
-5. You can optionally `Enable Automatic Deploys` to automatically redeploy the branch after any changes are merged to the GitHub repo
+    | SHEET_ID | URL for shared Google Sheet |
+
+5. Click `Create`
+6. The app will run through deploying. Once it's finished, copy the URL in the upper portion of the screen and return to the bot at `dev.groupme.com` and edit it to paste the URL into the `Callback URL` field.
 
 ### 5. Testing
 
