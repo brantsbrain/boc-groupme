@@ -51,7 +51,7 @@ const postPrayerRequestList = async () => {
     const prayList = filterRegexMsgList(myLikeList, prayregex)
     const praiseList = filterRegexMsgList(myLikeList, praiseregex)
     const praisepraylist = praiseList.concat(prayList)
-    console.log(praisepraylist)
+    // console.log(praisepraylist)
     await filterAndPostWeeklyList(praisepraylist)
 }
 
@@ -217,6 +217,7 @@ const composePrayerRequestList = (msgList) => {
         postList.push(post)
     }
 
+    console.log(postList)
     return postList
 }
 
