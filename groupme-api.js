@@ -51,6 +51,7 @@ const postPrayerRequestList = async () => {
     const prayList = filterRegexMsgList(myLikeList, prayregex)
     const praiseList = filterRegexMsgList(myLikeList, praiseregex)
     const praisepraylist = praiseList.concat(prayList)
+    console.log(praisepraylist)
     await filterAndPostWeeklyList(praisepraylist)
 }
 
@@ -66,7 +67,6 @@ const getMyLikeList = async () => {
         if (response.statusCode == 200) {
             const likedMessageList = response.body.response.messages
             console.log("Got liked messages list...")
-            console.log(likedMessageList)
             return likedMessageList
         }
         return []
