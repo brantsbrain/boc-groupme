@@ -171,6 +171,7 @@ const composePrayerRequestList = (msgList) => {
 
     // Displays prayer list in chronological order
     msgList = msgList.reverse()
+    console.log(msgList)
 
     msgList.map((msg) => {
         const userName = msg.name
@@ -190,6 +191,7 @@ const composePrayerRequestList = (msgList) => {
         if (text) {
             // Add the author's name to the post
             text = `${firstName} ${type} - ${text}\n\n`
+            console.log(text)
 
             // If text meets the char requirement, append to post
             if ((text.length + post.length) < 1000) {
