@@ -9,7 +9,6 @@ const {
   everyoneregex, createMention, getAdmins,
   postPrayerRequestList
 } = require("./groupme-api")
-const nodeCron = require("node-cron")
 
 ////////// INITIALIZE VARS //////////
 const sleep = (ms) => {
@@ -18,14 +17,6 @@ const sleep = (ms) => {
 
 // Header values
 const sunpost = "sunpost"
-
-////////// CRON JOBS //////////
-// Adjust +4 hours for UTC
-// Post weekly on Sunday 8:00 AM EST
-/* const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
-  console.log("Posting prayer request list...")
-  postPrayerRequestList()
-}) */
 
 ////////// RESPOND //////////
 const respond = async (req, res) => {
