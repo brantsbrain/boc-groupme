@@ -16,13 +16,16 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// Header values
+const sunpost = "sunpost"
+
 ////////// CRON JOBS //////////
 // Adjust +4 hours for UTC
 // Post weekly on Sunday 8:00 AM EST
-const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
+/* const weeklyList = nodeCron.schedule("0 12 * * 0", function weeklyList() {
   console.log("Posting prayer request list...")
   postPrayerRequestList()
-})
+}) */
 
 ////////// RESPOND //////////
 const respond = async (req, res) => {
@@ -32,6 +35,13 @@ const respond = async (req, res) => {
     const senderid = request.user_id
     const sendername = request.name
     console.log(`User request: "${requesttext}"`)
+
+    // Auto-create Sunday prayer/praise list on cron job POSTs
+    const headerkeys = Object.keys(req.headers)
+    if ((headerkeys.indexOf(sunpost) > -1)) {
+      console.log(`Found ${sunpost}...`)
+      await postPrayerRequestList()
+    }
 
     // If text exists
     if (requesttext) {
