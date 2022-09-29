@@ -164,13 +164,18 @@ const composePrayerRequestList = (msgList) => {
   let post = ""
 
   // Displays prayer list in chronological order
-  msgList = msgList.reverse()
+  // msgList = msgList.reverse()
 
   msgList.map((msg) => {
     const userName = msg.name
     const firstName = userName.split(" ")[0]
     let text = ""
     let type = ""
+    let epoch = msg.created_at
+    let date = new Date(0)
+    date.setUTCSeconds(epoch)
+    console.log(date)
+    date = date.toDateString()
 
     // Split out the first char sequence "/pray " or "/praise " from the user's post
     if (prayregex.test(msg.text)) {
@@ -183,7 +188,7 @@ const composePrayerRequestList = (msgList) => {
 
     if (text) {
       // Add the author's name to the post
-      text = `${firstName} ${type} - ${text}\n\n`
+      text = `${firstName} ${type} - ${date} - ${text}\n\n`
       console.log(text)
 
       // If text meets the char requirement, append to post
