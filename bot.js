@@ -4,7 +4,6 @@ const {
   praiseregex, prayregex,
   helptext, helpregex,
   coolregex, genlistregex,
-  sheetregex, sheetid,
   createPost, likeMessage,
   everyoneregex, getAdmins,
   getGoing, getMembers, goingregex,
@@ -58,11 +57,6 @@ const respond = async (req, res) => {
       // Post cool face
       else if (coolregex.test(requesttext)) {
         await createCoolFaceMessage()
-      } 
-      
-      // Post sheet link
-      else if (sheetregex.test(requesttext)) {
-        await createPost(sheetid)
       } 
       
       // Post help text
