@@ -446,7 +446,6 @@ exports.composePrayerRequestList = composePrayerRequestList
 exports.sheetregex = sheetregex
 exports.sheetid = sheetid
 exports.everyoneregex = everyoneregex
-exports.createMention = createMention
 exports.getAdmins = getAdmins
 exports.helpregex = helpregex
 exports.helptext = helptext
