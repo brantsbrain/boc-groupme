@@ -9,7 +9,8 @@ const helptext = "Prayer Bot Commands:\n" +
   "/praise - Submit something you want to praise\n" +
   "/list - List all prayers and praises within the past week (auto-posts Sunday 8:00 AM)\n" +
   "/sheet - Post link to Sabbath Dinner sheet\n" +
-  "/everyone - Mention everyone in the group (admins only)\n"
+  "/everyone - Mention everyone in the group (admins only)\n" +
+  "/going - Mention everyone going to nearest upcoming event (admins only)"
 
 const bot_id = process.env.BOT_ID
 const accesstoken = process.env.ACCESS_TOKEN
@@ -31,7 +32,6 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// msgId: str
 // The bot uses the owner's credential to like a message with msgId
 const likeMessage = async (msgId) => {
   const likePath = `/v3/messages/${groupid}/${msgId}/like?token=${accesstoken}`
@@ -46,6 +46,7 @@ const likeMessage = async (msgId) => {
   }
 }
 
+// Post prayer/praise list
 const postPrayerRequestList = async () => {
   const myLikeList = await getMyLikeList()
   const prayList = filterRegexMsgList(myLikeList, prayregex)
@@ -75,6 +76,7 @@ const getMyLikeList = async () => {
   }
 }
 
+// Send DM to user id
 const sendDm = async (userid, message) => {
   console.log(`Creating new DM (${message.length}): ${message}`)
   const recipient_id = userid
@@ -289,77 +291,136 @@ const getAdmins = async () => {
   return adminarr
 }
 
-// Create mention post
-const createMention = async (slashtext) => {
-  console.log(`Creating new mention (${slashtext.length}): ${slashtext}`)
-  let text = slashtext.replace("/", "@")
-  const message = {
-    text,
-    bot_id,
-    attachments: [{ loci: [], type: "mentions", user_ids: [] }]
+// Create a post and mention users if ID array is provided
+const createPost = async (message, mentionids) => {
+  console.log(`Creating new post (${message.length}): ${message}`)
+  const postPath = "/v3/bots/post"
+  const desturl = new URL(postPath, baseurl)
+
+  // Keep from endless loop in mentions
+  if (message[0] == "/") {
+    message = message.replace("/", "@")
   }
 
-  // Get member IDs as an array and push to message variable
-  members = await getMembers()
-  for (let i = 0; i < members.length; i++) {
-    message.attachments[0].loci.push([0, text.length])
-    message.attachments[0].user_ids.push(members[i])
+  // Replace curly quotes (usually from Apple devices)
+  message = message
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+
+  // Prep message as array to accomadate long messages 
+  var messagearr = []
+  var currmess = ""
+  for (let i = 0; i < message.length; i++) {
+    if (currmess.length < 999) {
+      currmess += message[i]
+    }
+    else {
+      messagearr.push(currmess)
+      currmess = ""
+    }
+  }
+  if (currmess.length > 0) {
+    messagearr.push(currmess)
   }
 
-  // Prep message as JSON and construct packet
-  const json = JSON.stringify(message)
-  const groupmeAPIOptions = {
-    agent: false,
-    host: "api.groupme.com",
-    path: "/v3/bots/post",
-    port: 443,
-    method: "POST",
-    headers: {
-      "Content-Length": json.length,
-      "Content-Type": "application/json",
-      "X-Access-Token": accesstoken
+  // Iterate through array as mentions or regular post
+  for (let i = 0; i < messagearr.length; i++) {
+    sleep(100)
+    var text = messagearr[i]
+
+    // Send message(s) w/ mention(s)
+    if (mentionids) {
+      console.log(`Creating new mention (${messagearr[i].length}): ${messagearr[i]}`)
+      var payload = {
+        text,
+        bot_id,
+        attachments: [{ loci: [], type: "mentions", user_ids: [] }]
+      }
+
+      for (let y = 0; y < mentionids.length; y++) {
+        payload.attachments[0].loci.push([0, messagearr[i].length])
+        payload.attachments[0].user_ids.push(mentionids[y])
+      }
+
+      console.log(`Mentioning: ${payload.attachments[0].user_ids}`)
+
+      // Prep message as JSON and construct packet
+      const json = JSON.stringify(payload)
+      const groupmeAPIOptions = {
+        agent: false,
+        host: "api.groupme.com",
+        path: "/v3/bots/post",
+        port: 443,
+        method: "POST",
+        headers: {
+          "Content-Length": json.length,
+          "Content-Type": "application/json",
+          "X-Access-Token": accesstoken
+        }
+      }
+
+      const req = https.request(groupmeAPIOptions, response => {
+        let data = ""
+        response.on("data", chunk => (data += chunk))
+        response.on("end", () =>
+          console.log(`[GROUPME RESPONSE] ${response.statusCode} ${data}`)
+        )
+      })
+      req.end(json)
+    }
+
+    // Send regular message(s)
+    else {
+      var payload = {
+        "text": messagearr[i],
+        bot_id
+      }
+      var response = await got.post(desturl, {
+        json: payload
+      })
+
+      const statusCode = response.statusCode
+      if (statusCode !== 201) {
+        console.log(`Error creating a post ${statusCode}`)
+      }
+    }
+  }
+}
+
+// Get array of IDs going to nearest non-deleted event
+const getGoing = async () => {
+  const limit = 5
+  const date = new Date().getTime()
+  const yesterdaylong = date - 24 * 60 * 60 * 1000
+  const yesterday = new Date(yesterdaylong)
+  var end_at = yesterday.toISOString()
+
+  const getpath = `/v3/conversations/${groupid}/events/list?end_at=${end_at}&limit=${limit}&token=${accesstoken}`
+  const desturl = new URL(getpath, baseurl)
+  const response = await got(desturl, {
+    responseType: "json"
+  })
+
+  console.log(response.body.response)
+
+  const eventarr = response.body.response.events
+  let goodevent = []
+
+  for (var i = 0; i < eventarr.length; i++) {
+    if ("deleted_at" in eventarr[i]) {
+      console.log(`Found deleted_at in ${JSON.stringify(eventarr[i])}`)
+    }
+    else {
+      goodevent = eventarr[i]
+      console.log(`Found good event: ${JSON.stringify(goodevent)}`)
+      break
     }
   }
 
-  // Send request
-  const req = https.request(groupmeAPIOptions, response => {
-    let data = ""
-    response.on("data", chunk => (data += chunk))
-    response.on("end", () =>
-      console.log(`[GROUPME RESPONSE] ${response.statusCode} ${data}`)
-    )
-  })
-  req.end(json)
-}
+  const memberarr = goodevent.going
+  console.log(`Mentioning this array: ${memberarr}`)
 
-// Tell the bot to create a post within its group
-const createPost = async (message) => {
-  console.log(`Creating new post (${message.length}): ${message}`)
-  const postPath = "/v3/bots/post"
-  const destUrl = new URL(postPath, baseurl)
-
-  const response = await got.post(destUrl, {
-    json: {
-      "bot_id": bot_id,
-      "text": String(message),
-    },
-  })
-
-  const statusCode = response.statusCode
-  if (statusCode !== 201) {
-    console.log(`Error creating a post ${statusCode}`)
-  }
-}
-
-
-// Returns all your bots and their info
-const getBots = async () => {
-  const groupPath = `/v3/bots?token=${accesstoken}`
-  const destUrl = new URL(groupPath, baseurl)
-  const response = await got(destUrl, {
-    responseType: "json"
-  })
-  console.log(response.body.response)
+  return memberarr
 }
 
 const helpregex = /^(\s)*\/help/i
@@ -369,6 +430,7 @@ const genlistregex = /^(\s)*\/list/i
 const coolregex = /^(\s)*\/cool/
 const sheetregex = /^(\s)*\/sheet/i
 const everyoneregex = /^(\s)*\/everyone/i
+const goingregex = /^(\s)*\/going/i
 
 exports.praiseregex = praiseregex
 exports.prayregex = prayregex
@@ -389,3 +451,6 @@ exports.createMention = createMention
 exports.getAdmins = getAdmins
 exports.helpregex = helpregex
 exports.helptext = helptext
+exports.getGoing = getGoing
+exports.getMembers = getMembers
+exports.goingregex = goingregex
