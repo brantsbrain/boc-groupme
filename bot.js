@@ -4,9 +4,9 @@ const {
   praiseregex, prayregex,
   helptext, helpregex,
   coolregex, genlistregex,
-  sheetregex, sheetid,
   createPost, likeMessage,
-  everyoneregex, createMention, getAdmins,
+  everyoneregex, getAdmins,
+  getGoing, getMembers, goingregex,
   postPrayerRequestList
 } = require("./groupme-api")
 
@@ -59,11 +59,6 @@ const respond = async (req, res) => {
         await createCoolFaceMessage()
       } 
       
-      // Post sheet link
-      else if (sheetregex.test(requesttext)) {
-        await createPost(sheetid)
-      } 
-      
       // Post help text
       else if (helpregex.test(requesttext)) {
         await createPost(helptext)
@@ -72,14 +67,25 @@ const respond = async (req, res) => {
       ////////// ADMIN CONTROLS //////////
       // Mention everyone
       else if (everyoneregex.test(requesttext)) {
-          let adminarr = await getAdmins()
-          if (adminarr.indexOf(senderid) > -1) {
-            await createMention(requesttext)
-          }
-          else {
-            console.log(`${sendername} attempted to mention everybody`)
-          }
+        const adminarr = await getAdmins()
+        if (adminarr.indexOf(senderid) > -1) {
+          await createPost(requesttext, await getMembers())
         }
+        else {
+          console.log(`${sendername} attempted to run /everyone`)
+        }
+      }
+
+      // Mention people going to nearest event
+      else if (goingregex.test(requesttext)) {
+        const adminarr = await getAdmins()
+        if (adminarr.indexOf(senderid) > -1) {
+          await createPost(requesttext, await getGoing())
+        }
+        else {
+          console.log(`${sendername} attempted to run /going`)
+        }
+      }
 
       ////////// NO CONDITIONS MET //////////
       else {
