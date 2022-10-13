@@ -8,14 +8,12 @@ const helptext = "Prayer Bot Commands:\n" +
   "/pray - Submit something you'd like prayer for\n" +
   "/praise - Submit something you want to praise\n" +
   "/list - List all prayers and praises within the past week (auto-posts Sunday 8:00 AM)\n" +
-  "/sheet - Post link to Sabbath Dinner sheet\n" +
   "/everyone - Mention everyone in the group (admins only)\n" +
   "/going - Mention everyone going to nearest upcoming event (admins only)"
 
 const bot_id = process.env.BOT_ID
 const accesstoken = process.env.ACCESS_TOKEN
 const groupid = process.env.GROUP_ID
-const sheetid = process.env.SHEET_ID
 const loguserid = process.env.LOG_USERID
 
 if (!accesstoken) {
@@ -23,9 +21,6 @@ if (!accesstoken) {
 }
 if (!groupid) {
   console.log("ENV: 'GROUP_ID' is undefined")
-}
-if (!sheetid) {
-  console.log("ENV: 'SHEET_ID' is undefined")
 }
 
 const sleep = (ms) => {
@@ -428,7 +423,6 @@ const prayregex = /^(\s)*\/pray/i
 const praiseregex = /^(\s)*\/praise/i
 const genlistregex = /^(\s)*\/list/i
 const coolregex = /^(\s)*\/cool/
-const sheetregex = /^(\s)*\/sheet/i
 const everyoneregex = /^(\s)*\/everyone/i
 const goingregex = /^(\s)*\/going/i
 
@@ -443,8 +437,6 @@ exports.filterMsgList = filterRegexMsgList
 exports.postPrayerRequestList = postPrayerRequestList
 exports.filterAndPostWeeklyList = filterAndPostWeeklyList
 exports.composePrayerRequestList = composePrayerRequestList
-exports.sheetregex = sheetregex
-exports.sheetid = sheetid
 exports.everyoneregex = everyoneregex
 exports.getAdmins = getAdmins
 exports.helpregex = helpregex
