@@ -436,7 +436,6 @@ exports.praiseregex = praiseregex
 exports.prayregex = prayregex
 exports.coolregex = coolregex
 exports.genlistregex = genlistregex
-exports.getBots = getBots
 exports.createPost = createPost
 exports.likeMessage = likeMessage
 exports.getMyLikeList = getMyLikeList
